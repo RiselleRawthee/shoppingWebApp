@@ -1,0 +1,54 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": {
+          "tool_name": "Write",
+          "file_paths": ["backend/**/*.py"]
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd backend && ruff check ${file} --fix && echo '[Hook] ruff: OK'"
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "tool_name": "Edit",
+          "file_paths": ["backend/**/*.py"]
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd backend && ruff check ${file} --fix && echo '[Hook] ruff: OK'"
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "tool_name": "Write",
+          "file_paths": ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"]
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd frontend && npx eslint ${file} --fix && echo '[Hook] eslint: OK'"
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "tool_name": "Edit",
+          "file_paths": ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"]
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd frontend && npx eslint ${file} --fix && echo '[Hook] eslint: OK'"
+          }
+        ]
+      }
+    ]
+  }
+}
