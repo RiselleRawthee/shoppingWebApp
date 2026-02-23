@@ -15,6 +15,12 @@ backend/shoplite.db
 .env
 .env.*
 
+# Node.js
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
 # Frontend
 frontend/node_modules/
 frontend/dist/

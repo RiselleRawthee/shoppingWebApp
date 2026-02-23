@@ -1,0 +1,47 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(200)
+  description String
+  price       Float
+  image_url   String     @db.VarChar(500)
+  category    String     @db.VarChar(100)
+  stock       Int        @default(0)
+  cart_items  CartItem[]
+  reviews     Review[]
+
+  @@map("products")
+}
+
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  session_id String   @db.VarChar(100)
+  product_id Int
+  quantity   Int      @default(1)
+  created_at DateTime @default(now())
+  product    Product  @relation(fields: [product_id], references: [id])
+
+  @@index([session_id])
+  @@map("cart_items")
+}
+
+model Review {
+  id            Int      @id @default(autoincrement())
+  product_id    Int
+  reviewer_name String
+  rating        Int
+  comment       String?
+  created_at    DateTime @default(now())
+  product       Product  @relation(fields: [product_id], references: [id])
+
+  @@unique([product_id, reviewer_name])
+  @@map("reviews")
+}

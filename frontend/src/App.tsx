@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom'
-import { ProductList } from './components/ProductList'
-import { ProductDetail } from './components/ProductDetail'
-import { Cart } from './components/Cart'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { ProductList } from './ui/ProductList'
+import { ProductDetail } from './ui/ProductDetail'
+import { Cart } from './ui/Cart'
+import { NotFoundPage } from './ui/NotFoundPage'
 import './index.css'
 
 function NavBar() {
@@ -41,11 +43,14 @@ export default function App() {
       <div className="min-h-screen bg-gray-50">
         <NavBar />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Routes>
-            <Route path="/" element={<ProductList />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<Cart />} />
-          </Routes>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<ProductList />} />
+              <Route path="/products/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </ErrorBoundary>
         </main>
       </div>
     </BrowserRouter>

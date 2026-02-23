@@ -10,43 +10,62 @@ A simple e-commerce app used to demonstrate Claude Code features: CLAUDE.md hier
 
 | Layer | Tech |
 |---|---|
-| Backend | Python 3.11, FastAPI, SQLAlchemy, SQLite |
+| Backend | Node.js 20, Express 4, TypeScript, Prisma ORM, PostgreSQL |
 | Frontend | React 18, TypeScript, Vite, Tailwind CSS |
-| Tests | pytest + httpx (backend), Vitest + RTL (frontend) |
+| Tests | Jest + Supertest (backend), Vitest + RTL (frontend) |
+| Docs | Swagger UI at `/api-docs` (OpenAPI 3.0, generated from Zod schemas) |
+
+---
+
+## Prerequisites
+
+- Node.js 20+
+- Docker + Docker Compose (for PostgreSQL)
 
 ---
 
 ## Quick Start
 
-### Backend
+### 1. Start the database
+```bash
+docker-compose up -d
+```
+
+### 2. Backend
 ```bash
 cd backend
-pip install -r requirements-dev.txt
-cd .. && python scripts/seed_db.py   # seed the database (first time)
-cd backend && uvicorn app.main:app --reload
+npm install
+npm run db:migrate    # apply Prisma migrations
+npm run db:seed       # seed 10 products
+npm run dev           # API at http://localhost:8000
 ```
-API available at http://localhost:8000
 
-### Frontend
+Swagger docs available at http://localhost:8000/api-docs
+
+### 3. Frontend
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev           # App at http://localhost:5173
 ```
-App available at http://localhost:5173
 
 ---
 
 ## Running Tests
 
+### Backend
 ```bash
 cd backend
-pytest tests/ -v
+npm run test:unit          # unit tests (mocked DB, fast)
+npm run test:integration   # integration tests (requires docker-compose up -d)
+npm test                   # all tests
 ```
 
-**Expected output (pre-demo state)**:
-- 12 tests passing
-- 8 tests `xfail` (SL-17 — product reviews, not yet implemented)
+### Frontend
+```bash
+cd frontend
+npm test
+```
 
 ---
 
@@ -54,46 +73,59 @@ pytest tests/ -v
 
 ```
 shoplite/
-├── CLAUDE.md                    # Org-level: git, PR, security, MCP config
-├── .mcp.json                    # MCP server config
+├── CLAUDE.md                      # Git, PR, security, MCP conventions
+├── docker-compose.yml             # PostgreSQL (dev + test containers)
+├── .github/workflows/ci.yml       # CI: lint + test + build on every PR
+├── .mcp.json                      # MCP server config
 ├── .claude/
-│   ├── settings.json            # Hooks (ruff + eslint)
+│   ├── settings.json              # Hooks (eslint)
 │   └── skills/
-│       ├── jira-ticket.md       # /jira-ticket skill
-│       ├── pr-ready.md          # /pr-ready skill
-│       └── code-review.md       # /code-review skill
+│       ├── jira-ticket.md         # /jira-ticket skill
+│       ├── pr-ready.md            # /pr-ready skill
+│       └── code-review.md         # /code-review skill
 ├── backend/
-│   ├── CLAUDE.md                # Python/FastAPI conventions
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── database.py
-│   │   ├── models.py
-│   │   ├── schemas.py
-│   │   └── routers/
-│   │       ├── products.py      # GET /products, GET /products/{id}
-│   │       ├── cart.py          # POST/DELETE /cart
-│   │       └── reviews.py       # STUB — SL-17
+│   ├── CLAUDE.md                  # Node.js/Express conventions
+│   ├── Dockerfile                 # Multi-stage production build
+│   ├── prisma/
+│   │   ├── schema.prisma          # Product, CartItem, Review models
+│   │   └── seed.ts                # Seeds 10 products
+│   ├── src/
+│   │   ├── config/env.ts          # Typed env vars
+│   │   ├── lib/prisma.ts          # PrismaClient singleton
+│   │   ├── errors/AppError.ts     # Custom error class
+│   │   ├── middleware/            # validate, errorHandler, requestLogger
+│   │   ├── repositories/          # Pure Prisma queries
+│   │   ├── services/              # Business logic
+│   │   ├── controllers/           # HTTP handlers
+│   │   ├── routers/               # Route definitions
+│   │   ├── schemas/               # Zod + OpenAPI schemas
+│   │   ├── docs/swagger.ts        # OpenAPI document assembly
+│   │   ├── app.ts                 # Express app factory
+│   │   └── index.ts               # Server entry point
 │   └── tests/
-│       ├── conftest.py
-│       ├── test_products.py     # 6 passing tests
-│       ├── test_cart.py         # 6 passing tests
-│       └── test_reviews.py      # 8 xfail tests (SL-17)
-├── frontend/
-│   ├── CLAUDE.md                # TypeScript/React conventions
-│   └── src/
-│       ├── components/
-│       │   ├── ProductList.tsx  # working
-│       │   ├── ProductDetail.tsx # working (TODO comment for reviews)
-│       │   ├── Cart.tsx         # working
-│       │   └── ReviewSection.tsx # STUB — SL-17
-│       ├── hooks/
-│       │   ├── useProducts.ts   # working
-│       │   ├── useCart.ts       # working
-│       │   └── useReviews.ts    # STUB — SL-17
-│       ├── types/index.ts
-│       └── api/client.ts
-└── scripts/
-    └── seed_db.py
+│       ├── unit/                  # Service tests (mocked repos)
+│       └── integration/           # HTTP tests (Supertest + real DB)
+└── frontend/
+    ├── CLAUDE.md                  # TypeScript/React conventions
+    └── src/
+        ├── ui/                    # Page-level components
+        │   ├── ProductList.tsx
+        │   ├── ProductDetail.tsx
+        │   ├── Cart.tsx
+        │   └── NotFoundPage.tsx
+        ├── components/            # Reusable components
+        │   ├── ui/                # Atomic: Button, Badge, Price, etc.
+        │   ├── ProductCard.tsx
+        │   ├── CartItemRow.tsx
+        │   ├── CategoryFilter.tsx
+        │   ├── ReviewSection.tsx  # STUB — SL-17
+        │   └── ErrorBoundary.tsx
+        ├── hooks/
+        │   ├── useProducts.ts
+        │   ├── useCart.ts
+        │   └── useReviews.ts      # STUB — SL-17
+        ├── api/client.ts
+        └── types/index.ts
 ```
 
 ---
@@ -104,7 +136,7 @@ The feature to build live during the demo:
 
 > **As a customer, I want to leave a star rating and review on a product so that other shoppers can make informed decisions.**
 
-Acceptance criteria (mapped 1:1 to `tests/test_reviews.py`):
+Acceptance criteria (mapped 1:1 to `tests/integration/reviews.test.ts`):
 1. POST a review with rating 1–5 and optional comment → 201
 2. GET all reviews for a product → includes average rating and total count
 3. Duplicate reviewer name per product → 409
@@ -124,18 +156,17 @@ export GITHUB_TOKEN="ghp_..."
 export JIRA_URL="https://yourorg.atlassian.net"
 export JIRA_EMAIL="you@yourorg.com"
 export JIRA_API_TOKEN="..."
-export NOTION_TOKEN="secret_..."
+export CONFLUENCE_URL="https://yourorg.atlassian.net/wiki"
+export POSTGRES_CONNECTION_STRING="postgresql://shoplite:shoplite@localhost:5432/shoplite"
 ```
-
-The SQLite MCP reads `./backend/shoplite.db` — no auth required.
 
 ---
 
 ## Resetting to Demo Start State
 
 ```bash
-git checkout demo-start     # reset all stub files
-rm -f backend/shoplite.db   # remove any demo DB
-python scripts/seed_db.py   # re-seed
-cd backend && pytest tests/ -v   # confirm 12 pass, 8 xfail
+git checkout demo-start
+docker-compose down -v && docker-compose up -d
+cd backend && npm run db:migrate && npm run db:seed
+npm test   # confirm unit + integration tests pass (reviews return 501)
 ```
