@@ -88,38 +88,38 @@ Construct the full page body using **exactly** this structure:
 # {use case name}
 
 ## Use case description
-{2–3 sentences: what the use case is about, what AI was used for, and how it accelerated the development process — drawn from the conversation}
+{2–3 sentences: what the use case is about and how the AI feature or skill accelerates the development process. Focus on the outcome, not the implementation detail.}
 
 ## AI tooling description
 
-### Files and tooling created to enhance Claude Code
-{List each Claude Code tooling artefact that was relevant to this use case. For each, include:
- - the relative file path as a markdown link
- - what it does generally
- - how it was specifically used or referenced in this session
+### Files created to enable this use case
+{List all files that are central to this use case — including files created or modified in this session AND pre-existing files that are integral to the workflow being documented (e.g. a skill that completes a multi-step pipeline). For each:
+ - bold filename (no path links needed)
+ - one sentence on what it does
+ - one sentence on how it fits into this use case (if created in this session, note that; if pre-existing but part of the workflow, describe its role)
 
-Examples:
-- **[`.claude/skills/git-commit.md`](.claude/skills/git-commit.md)** — automates sprint ticket matching, Jira transitions, conventional commit generation, push, and optional PR creation. Used in this session to commit and push the feature branch with linked ticket keys in one command.
-- **[`CLAUDE.md`](CLAUDE.md)** — project context file giving Claude persistent knowledge of architecture, stack, and conventions. Eliminated the need to re-explain the codebase structure in every prompt.
-- **[`.claude/settings.json`](.claude/settings.json) hooks** — PostToolUse hooks that run ESLint automatically after every TypeScript edit. Fired automatically during this session each time a `.ts` file was saved.
-- **[`.mcp.json`](.mcp.json)** — configures Jira, GitHub, and Confluence MCP servers so Claude could create tickets, push code, and update docs without leaving the terminal.}
+If the use case spans a multi-skill pipeline (e.g. `/create-ticket` → `/git-commit` → `/merge-pr`), include ALL skills in the pipeline even if some were not created in this session. Do not list every file touched — only those central to the use case.}
 
-### What went well and areas for improvement
+### What went well
+{2–3 sentences maximum. Name one or two specific things that worked well, grounded in what actually happened in the conversation and the Claude Code best practices. Be concrete — reference a feature or behaviour by name.}
 
-**What went well:**
-{From the conversation and best practices: 2–3 specific things that worked effectively — e.g. plan mode produced an accurate implementation plan before any code was written, the skill automatically matched the correct sprint ticket without user input, CLAUDE.md conventions meant no boilerplate clarification was needed}
-
-**Areas for improvement:**
-{From iterations/friction spotted in the conversation and gaps vs. best practices: 2–3 concrete suggestions — e.g. the skill asked for manual confirmation on ticket matching where it could have been auto-detected, the CLAUDE.md could include example commit messages to improve output consistency, sub-agents could parallelise the Jira + GitHub fetch steps}
+### Areas for improvement
+{2–3 sentences maximum. Name one or two concrete, actionable improvements based on friction observed in the conversation or gaps vs. best practices. Avoid generic advice.}
 
 ### Impact vs. plain prompting
-{Explain what the tooling enabled that a plain unassisted prompt could not reliably reproduce — e.g. automatic Jira status transitions across parent and child tickets, enforced conventional commit format with ticket reference, multi-system orchestration (Jira + GitHub + Confluence) in a single command, context from CLAUDE.md preventing hallucinated architecture}
-
-### Referenced codebase files
-{Key files touched or referenced during this session, as relative markdown links}
+{2–3 sentences maximum. Explain what this tooling produced that a plain unassisted prompt could not reliably reproduce. Focus on consistency, automation, or multi-system integration.}
 
 ## Brief use case/workflow explanation
-{A concrete walkthrough based on what actually happened in the conversation. Describe the sequence of commands invoked, what Claude did automatically at each step, what the user confirmed or adjusted, and what the final outcome was. Use the real branch name, ticket keys, and commands from the session. Explain why this is valuable compared to doing each step manually.}
+
+**When to use it:** {one sentence describing when a developer should invoke this skill or use this feature}
+
+**Steps:**
+1. {step 1}
+2. {step 2}
+3. {step 3}
+... (keep to 5–7 steps)
+
+**Example:** {A concrete, realistic example of a developer using this feature in their day-to-day work — different from the session that produced this page, to show broader applicability.}
 
 ## Tickets and code changes
 
@@ -132,7 +132,7 @@ Examples:
 {list each matched PR: - [PR #N — title](url) (state)}
 ```
 
-If the user provided additional notes/corrections in Step 1, weave them into the relevant sections.
+If the user provided additional notes/corrections in Step 1, weave them into the relevant sections. Keep every section concise — this page is one of many use cases and must be easy to scan.
 
 ---
 
