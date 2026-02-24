@@ -56,7 +56,22 @@ Should I link these to your commit? (confirm all / pick specific ones / none)
 
 If no matches are found, tell the user and ask them to manually specify a ticket key or continue without linking.
 
-### Step 4 — Transition confirmed tickets and their parents to "In Progress"
+### Step 4 — Check branch alignment
+
+Compare the current branch name against the confirmed ticket key(s).
+
+- If the current branch **already contains** the ticket key (e.g. branch is `feature/AADW-16-...` and ticket is `AADW-16`), proceed to Step 5.
+- If the current branch **does not contain** the ticket key, warn the user and ask:
+  ```
+  ⚠️  Your current branch is `{current-branch}` but the linked ticket is {AADW-X}.
+  Should I create a new branch before committing?
+  Suggested: feature/AADW-X-{ticket-summary-slug}
+  (yes — create and switch / no — commit to current branch anyway)
+  ```
+  - **If yes**: run `git checkout -b feature/AADW-X-{slug}` where the slug is the ticket summary lowercased with spaces replaced by hyphens, truncated to 40 characters. Use the new branch for all subsequent steps.
+  - **If no**: proceed on the current branch.
+
+### Step 5 — Transition confirmed tickets and their parents to "In Progress"
 
 For each confirmed ticket:
 1. Use `jira_get_transitions` on the ticket key to retrieve available transitions.
@@ -66,14 +81,14 @@ For each confirmed ticket:
 
 **Parent propagation:** If the confirmed ticket is a subtask, fetch its parent using `jira_get_issue` with `fields=parent,status`. If the parent is still in "To Do", transition it to "In Progress" as well using the same transition lookup.
 
-### Step 5 — Generate a conventional commit message
+### Step 6 — Generate a conventional commit message
 
 Build a commit message in the format:
 ```
 {type}({scope}): {description} [{TICKET-KEY}]
 ```
-- **type**: `feature` (new feature), `fix` (bug fix), `chore` (tooling/config), `refactor`, `test`, `docs`
-- **scope**: the primary area changed (e.g. `cart`, `auth`, `backend`, `frontend`)
+- **type**: `feat` (new feature), `fix` (bug fix), `chore` (tooling/config), `refactor`, `test`, `docs`
+- **scope**: the primary area changed (e.g. `cart`, `auth`, `backend`, `frontend`, `skills`)
 - **description**: concise summary of what changed, under 72 characters
 - **ticket key(s)**: all confirmed linked keys, e.g. `[AADW-1]` or `[AADW-1, AADW-3]`
 
@@ -81,20 +96,20 @@ Show the generated message to the user and ask: "Commit with this message? (yes 
 
 If the user wants to edit, accept their revised message before proceeding.
 
-### Step 6 — Stage and commit
+### Step 7 — Stage and commit
 
 Stage all relevant changed files (exclude `.env`, `node_modules`, `dist`, `.db`).
 
 Create the commit with the confirmed message.
 
-### Step 7 — Push to remote
+### Step 8 — Push to remote
 
 Push the current branch to origin:
 ```
 git push -u origin {current-branch}
 ```
 
-### Step 8 — Ask about creating a PR
+### Step 9 — Ask about creating a PR
 
 Ask the user: "Would you like to create a pull request to merge `{current-branch}` into `main`?"
 
@@ -102,7 +117,7 @@ If yes:
 1. Use the **GitHub MCP** `create_pull_request` on `RiselleRawthee/shoppingWebApp` with:
    - **base**: `main`
    - **head**: `{current-branch}`
-   - **title**: the commit message from Step 5
+   - **title**: the commit message from Step 6
    - **body**:
      ```
      ## Summary
@@ -127,7 +142,7 @@ If yes:
 
 If the user says no, skip PR creation and leave tickets in "In Progress".
 
-### Step 9 — Confirm
+### Step 10 — Confirm
 
 Output:
 - Commit SHA (short) and message
