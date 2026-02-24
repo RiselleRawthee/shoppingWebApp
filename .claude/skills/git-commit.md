@@ -4,7 +4,7 @@
 
 ## What This Skill Does
 
-Before committing code to GitHub, checks the active Jira sprint for tasks or subtasks related to the current code changes. Asks the user to confirm any matches, transitions confirmed tickets to "In Progress", then commits and pushes with a conventional commit message referencing the linked ticket keys.
+Before committing code to GitHub, checks the active Jira sprint for tasks or subtasks related to the current code changes. Asks the user to confirm any matches, transitions confirmed child tickets **and their parent tickets** to "In Progress", then commits and pushes with a conventional commit message referencing the linked ticket keys. Tickets only move to "Done" when the PR is merged — use the `/merge-pr` skill for that.
 
 ## Hardcoded Defaults
 
@@ -56,14 +56,15 @@ Should I link these to your commit? (confirm all / pick specific ones / none)
 
 If no matches are found, tell the user and ask them to manually specify a ticket key or continue without linking.
 
-### Step 4 — Transition confirmed tickets to "In Progress"
+### Step 4 — Transition confirmed tickets and their parents to "In Progress"
 
-For each ticket the user confirms:
+For each confirmed ticket:
 1. Use `jira_get_transitions` on the ticket key to retrieve available transitions.
 2. Find the transition named "In Progress" (or closest match: "In Development", "Start Progress").
 3. Use `jira_transition_issue` to apply it.
+4. Skip tickets already in "In Progress" or a further-along status (e.g. "Done").
 
-Skip tickets already in "In Progress" or a further-along status (e.g. "In Review", "Done").
+**Parent propagation:** If the confirmed ticket is a subtask, fetch its parent using `jira_get_issue` with `fields=parent,status`. If the parent is still in "To Do", transition it to "In Progress" as well using the same transition lookup.
 
 ### Step 5 — Generate a conventional commit message
 
@@ -122,10 +123,7 @@ If yes:
      - [ ] No hardcoded secrets
      ```
 
-2. If any Jira tickets were linked, transition each one to **"In Review"**:
-   - Use `jira_get_transitions` to find the "In Review" transition (or closest match).
-   - Use `jira_transition_issue` to apply it.
-   - This supersedes the "In Progress" status set in Step 4.
+2. Tickets stay in **"In Progress"** when a PR is raised — do not transition them. They will only move to "Done" when the PR is merged via the `/merge-pr` skill. Remind the user: "Run `/merge-pr` after this PR is merged to close the linked tickets."
 
 If the user says no, skip PR creation and leave tickets in "In Progress".
 
@@ -135,5 +133,5 @@ Output:
 - Commit SHA (short) and message
 - Branch pushed to
 - PR URL (if created), or "No PR created"
-- Jira tickets status: list each key, title, and final status ("In Progress" or "In Review")
+- Jira tickets status: list each key, title, and final status (child tickets and their parents should all be "In Progress")
 - Link to each updated ticket: `https://bbdcloud.atlassian.net/browse/{KEY}`
