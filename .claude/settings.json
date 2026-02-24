@@ -4,7 +4,9 @@
       {
         "matcher": {
           "tool_name": "Write",
-          "file_paths": ["backend/**/*.py"]
+          "file_paths": [
+            "backend/**/*.py"
+          ]
         },
         "hooks": [
           {
@@ -16,7 +18,9 @@
       {
         "matcher": {
           "tool_name": "Edit",
-          "file_paths": ["backend/**/*.py"]
+          "file_paths": [
+            "backend/**/*.py"
+          ]
         },
         "hooks": [
           {
@@ -28,7 +32,10 @@
       {
         "matcher": {
           "tool_name": "Write",
-          "file_paths": ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"]
+          "file_paths": [
+            "frontend/src/**/*.ts",
+            "frontend/src/**/*.tsx"
+          ]
         },
         "hooks": [
           {
@@ -40,7 +47,10 @@
       {
         "matcher": {
           "tool_name": "Edit",
-          "file_paths": ["frontend/src/**/*.ts", "frontend/src/**/*.tsx"]
+          "file_paths": [
+            "frontend/src/**/*.ts",
+            "frontend/src/**/*.tsx"
+          ]
         },
         "hooks": [
           {
@@ -49,6 +59,18 @@
           }
         ]
       }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "mcp__jira__jira_get_project_issues",
+      "mcp__jira__jira_get_sprints_from_board",
+      "mcp__github__list_pull_requests",
+      "Bash(git checkout:*)",
+      "mcp__jira__jira_get_transitions",
+      "mcp__jira__jira_transition_issue",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
