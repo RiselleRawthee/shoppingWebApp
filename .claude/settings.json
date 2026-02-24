@@ -70,7 +70,15 @@
       "mcp__jira__jira_get_transitions",
       "mcp__jira__jira_transition_issue",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "mcp__github__create_pull_request",
+      "mcp__jira__jira_create_remote_issue_link",
+      "mcp__jira__jira_create_sprint",
+      "mcp__confluence__confluence_get_page_children",
+      "mcp__confluence__confluence_create_page",
+      "mcp__confluence__confluence_update_page",
+      "mcp__github__get_pull_request_status"
     ]
   }
 }
