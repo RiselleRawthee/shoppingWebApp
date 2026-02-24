@@ -1,14 +1,24 @@
 # ShopLite Frontend — React/TypeScript Standards
 
 ## Stack
-React 18 + TypeScript + Vite + Tailwind CSS. No class components. No `.js` or `.jsx` files — TypeScript only.
+React 18 + TypeScript (strict) + Vite + Tailwind CSS. No class components (except `ErrorBoundary`). No `.js` or `.jsx` files — TypeScript only.
+
+## Folder Structure
+- `src/ui/` — page-level components (one per route). These compose reusable components. No logic here beyond wiring hooks to UI.
+- `src/components/` — reusable feature components (`ProductCard`, `CartItemRow`, `CategoryFilter`, etc.)
+- `src/components/ui/` — atomic/primitive components (`Button`, `Badge`, `Price`, `StockBadge`, `ProductImage`, `LoadingSpinner`, `ErrorAlert`, `EmptyState`, `BackLink`)
+- `src/hooks/` — custom hooks for data fetching and state
+- `src/api/` — API client (axios)
+- `src/types/` — shared TypeScript interfaces
+
+**Rule: never put reusable UI in `src/ui/`. Never put page-level logic in `src/components/`.**
 
 ## Component Standards
-- Functional components only, with explicit TypeScript prop types.
+- Functional components only (except `ErrorBoundary`), with explicit TypeScript prop types.
 - One component per file. File name matches component name (`PascalCase`).
 - Props interface defined inline above the component: `interface Props { ... }`
 - **No inline styles**. Use Tailwind utility classes only.
-- Components live in `src/components/`. No data fetching or business logic in components — extract to hooks.
+- No data fetching or business logic in components — extract to hooks.
 
 ## Hooks
 - Custom hooks live in `src/hooks/`. Naming: `use{Entity}.ts`
@@ -22,20 +32,18 @@ React 18 + TypeScript + Vite + Tailwind CSS. No class components. No `.js` or `.
 - Prefer `interface` over `type` for object shapes.
 - Event handlers should be named `handle{Event}` (e.g. `handleSubmit`, `handleAddToCart`).
 
-## Naming Conventions
-- Components: `PascalCase`
-- Hooks: `camelCase` starting with `use`
-- Types / interfaces: `PascalCase`
-- Files: match the primary export name
+## Environment Variables
+- API base URL comes from `import.meta.env.VITE_API_URL` — never hardcode localhost.
+- All Vite env vars are prefixed `VITE_` and defined in `frontend/.env`.
 
 ## Testing
-- Vitest + React Testing Library. Test files: `{Component}.test.tsx`
+- Vitest + React Testing Library. Test files co-located: `{Component}.test.tsx` beside `{Component}.tsx`.
 - Test user behaviour, not implementation details. Never assert on internal state.
+- Mock hooks in page-level (`src/ui/`) tests using `vi.mock`.
 
 ## Linting
-- ESLint config in `eslint.config.js`. Runs automatically via hooks after every `.ts`/`.tsx` edit.
-- You will see `[Hook] eslint: OK` fire automatically.
-- Run manually: `npx eslint src/ --fix`
+- ESLint config in `eslint.config.js`. Runs automatically via Husky pre-commit hook.
+- Run manually: `npm run lint`
 
 ## Key Commands
 ```bash
@@ -43,5 +51,5 @@ React 18 + TypeScript + Vite + Tailwind CSS. No class components. No `.js` or `.
 npm run dev      # start dev server
 npm test         # run Vitest
 npm run lint     # run ESLint
-npm run build    # production build
+npm run build    # production build (runs tsc + vite build)
 ```

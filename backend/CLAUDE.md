@@ -1,48 +1,66 @@
-# ShopLite Backend — Python/FastAPI Standards
+# ShopLite Backend — Node.js/Express Standards
 
-## Architecture
-- **Routers are thin**: validate input, query the database, return a response. No business logic in routers.
-- **Models** (`app/models.py`): SQLAlchemy ORM. One class per database table.
-- **Schemas** (`app/schemas.py`): Pydantic v2. Always define separate `Request` and `Response` schemas.
-- **Database**: SQLite via SQLAlchemy. Inject the session with `db: Session = Depends(get_db)`.
-- **No `SELECT *`**: Always specify columns explicitly in queries.
+## Stack
+Node.js 20 + Express 4 + TypeScript (strict) + Prisma ORM + PostgreSQL + Zod + Jest
 
-## Python Standards
-- Python 3.11+. Every function must have type hints. No exceptions.
-- Use `async def` for FastAPI route handlers.
-- Error handling: raise `HTTPException` with the appropriate status code. Never return 200 with an error body.
+## Architecture — Layered (Repository → Service → Controller → Router)
 
-## HTTP Status Codes
-| Scenario | Code |
-|---|---|
-| Resource created | 201 |
-| Resource not found | 404 |
-| Invalid input / failed validation | 422 |
-| Business rule violation (e.g. duplicate) | 409 |
-| Permission denied | 403 |
-| Successful delete | 204 |
+```
+Request → Router → Controller → Service → Repository → Prisma → PostgreSQL
+```
 
-## Naming Conventions
-- Files: `snake_case.py`
-- Classes: `PascalCase`
-- Functions / variables: `snake_case`
-- Router files: plural noun (`products.py`, `reviews.py`)
-- Schema classes: `{Entity}Request`, `{Entity}Response`
+- **Router** (`src/routers/`) — route definitions only. Binds HTTP paths to controller methods.
+- **Controller** (`src/controllers/`) — thin HTTP layer. Parses request, calls service, returns response. Always calls `next(err)` on failure.
+- **Service** (`src/services/`) — business logic. Throws `AppError` for all expected failures (404, 409, 422, 501). No Prisma calls here.
+- **Repository** (`src/repositories/`) — pure Prisma queries. No business logic, no error throwing.
+- **Schemas** (`src/schemas/`) — Zod schemas with `.openapi()` extensions. Used for both request validation and OpenAPI spec generation.
+
+## Error Handling
+- **Always** use `AppError` for user-facing errors: `throw new AppError('Product not found', 404)`
+- **Never** expose internal error details — unknown errors return `{ message: 'Internal server error' }`
+- Controllers call `next(err)` and let the global `errorHandler` middleware format the response
+- HTTP status codes: 200 (ok), 201 (created), 204 (deleted), 404 (not found), 409 (conflict), 422 (validation), 501 (not implemented)
+
+## TypeScript Standards
+- Strict mode enabled. **No `any` types. Ever.**
+- All functions must have explicit return types.
+- Use `interface` for object shapes, `type` for unions/aliases.
+- Unused variables prefixed with `_` to satisfy `noUnusedParameters`.
+
+## Validation
+- All request bodies validated with Zod via the `validate(schema)` middleware.
+- Zod schemas live in `src/schemas/` and are extended with `.openapi()` for Swagger docs.
+- **Never** trust raw `req.body` — always run it through a schema first.
+
+## Swagger / API Docs
+- OpenAPI spec is generated from Zod schemas using `@asteasolutions/zod-to-openapi`.
+- Docs served at `GET /api-docs`.
+- When adding a new endpoint: add Zod schema → register path in `src/docs/swagger.ts` → the spec auto-updates.
+
+## Database
+- Prisma schema in `prisma/schema.prisma`. Run `npm run db:migrate` after any model changes.
+- PrismaClient is a singleton in `src/lib/prisma.ts` — never instantiate it elsewhere.
+- Seed data: `npm run db:seed`
 
 ## Testing
-- Use `pytest`. All fixtures live in `tests/conftest.py`.
-- Each endpoint needs: happy path, not found / 404, invalid input / 422, and business rule violation.
-- Tests must be independent — no shared state between test functions.
-- New features get `xfail` tests written first (executable acceptance criteria). Remove `xfail` when implemented.
+- **Unit tests** (`tests/unit/`) — test service layer with `jest-mock-extended` mocks. No DB required.
+- **Integration tests** (`tests/integration/`) — test full HTTP stack with Supertest against real test DB (`DATABASE_URL_TEST`).
+- Coverage threshold: 80% across statements, branches, functions, lines.
 
 ## Linting
-- `ruff` is configured in `pyproject.toml`. Run: `ruff check . --fix`
-- `ruff` runs automatically via hooks after every `.py` file edit — you will see `[Hook] ruff: OK` fire.
+- ESLint with TypeScript rules. Run: `npm run lint` or `npm run lint:fix`
+- Runs automatically via Husky pre-commit hook.
 
 ## Key Commands
 ```bash
 # From backend/
-uvicorn app.main:app --reload   # start server
-pytest tests/ -v                # run tests
-ruff check . --fix              # lint
+npm run dev              # start dev server with hot reload (tsx watch)
+npm run build            # compile TypeScript to dist/
+npm run test:unit        # unit tests (fast, no DB)
+npm run test:integration # integration tests (requires docker-compose up -d)
+npm test                 # all tests
+npm run lint             # ESLint
+npm run db:migrate       # apply Prisma migrations
+npm run db:seed          # seed 10 products
+npm run db:studio        # open Prisma Studio (DB GUI)
 ```
