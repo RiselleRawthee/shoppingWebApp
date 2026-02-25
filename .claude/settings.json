@@ -79,7 +79,8 @@
       "mcp__confluence__confluence_create_page",
       "mcp__confluence__confluence_update_page",
       "mcp__github__get_pull_request_status",
-      "mcp__confluence__confluence_get_page"
+      "mcp__confluence__confluence_get_page",
+      "mcp__jira__jira_batch_create_issues"
     ]
   }
 }
