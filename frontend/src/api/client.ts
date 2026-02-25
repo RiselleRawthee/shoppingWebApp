@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { AddToCartRequest, CartResponse, CreateReviewRequest, ProductListResponse, Product, Review, ReviewListResponse } from '../types'
+import type { AddToCartRequest, CartResponse, CategoryListResponse, CreateReviewRequest, ProductListResponse, Product, Review, ReviewListResponse } from '../types'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8000',
@@ -31,4 +31,9 @@ export const reviewsApi = {
 
   create: (productId: number, data: CreateReviewRequest): Promise<Review> =>
     api.post(`/products/${productId}/reviews`, data).then((r) => r.data),
+}
+
+export const categoriesApi = {
+  list: (): Promise<CategoryListResponse> =>
+    api.get('/categories').then((r) => r.data),
 }

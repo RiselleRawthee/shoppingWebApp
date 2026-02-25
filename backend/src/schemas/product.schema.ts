@@ -23,3 +23,9 @@ export const ProductListResponseSchema = z
     total: z.number().int().openapi({ example: 10 }),
   })
   .openapi('ProductListResponse')
+
+export const CategoryListResponseSchema = z
+  .object({
+    categories: z.array(z.string()).openapi({ example: ['Accessories', 'Electronics', 'Furniture', 'Lighting'] }),
+  })
+  .openapi('CategoryListResponse')

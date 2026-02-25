@@ -55,3 +55,7 @@ export interface CreateReviewRequest {
   rating: number
   comment?: string
 }
+
+export interface CategoryListResponse {
+  categories: string[]
+}

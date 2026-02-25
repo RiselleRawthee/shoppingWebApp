@@ -23,4 +23,13 @@ export class ProductController {
       next(err)
     }
   }
+
+  listCategories = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await this.service.listCategories()
+      res.json(result)
+    } catch (err) {
+      next(err)
+    }
+  }
 }
