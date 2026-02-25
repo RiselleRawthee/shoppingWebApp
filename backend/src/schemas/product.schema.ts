@@ -12,6 +12,8 @@ export const ProductSchema = z
     image_url: z.string().url().openapi({ example: 'https://example.com/headphones.jpg' }),
     category: z.string().openapi({ example: 'Electronics' }),
     stock: z.number().int().openapi({ example: 25 }),
+    average_rating: z.number().openapi({ example: 4.2 }),
+    total_reviews: z.number().int().openapi({ example: 5 }),
   })
   .openapi('Product')
 

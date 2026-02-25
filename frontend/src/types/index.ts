@@ -6,6 +6,29 @@ export interface Product {
   image_url: string
   category: string
   stock: number
+  average_rating: number
+  total_reviews: number
+}
+
+export interface Review {
+  id: number
+  product_id: number
+  reviewer_name: string
+  rating: number
+  comment: string | null
+  created_at: string
+}
+
+export interface ReviewListResponse {
+  reviews: Review[]
+  average_rating: number
+  total_reviews: number
+}
+
+export interface CreateReviewRequest {
+  reviewer_name: string
+  rating: number
+  comment?: string
 }
 
 export interface ProductListResponse {
