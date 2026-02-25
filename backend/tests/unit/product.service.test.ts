@@ -10,6 +10,8 @@ const mockProduct = {
   image_url: 'https://example.com/headphones.jpg',
   category: 'Electronics',
   stock: 25,
+  average_rating: 4.2,
+  total_reviews: 5,
 }
 
 describe('ProductService', () => {

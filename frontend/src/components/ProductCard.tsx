@@ -22,6 +22,12 @@ export function ProductCard({ product, to }: Props) {
       <div className="p-4">
         <Badge label={product.category} />
         <h3 className="mt-1 text-sm font-semibold text-gray-900 line-clamp-2">{product.name}</h3>
+        <div className="mt-1 text-xs text-gray-500">
+          {product.total_reviews > 0
+            ? <span><span className="text-yellow-400">★</span> {product.average_rating.toFixed(1)} · {product.total_reviews} {product.total_reviews === 1 ? 'review' : 'reviews'}</span>
+            : <span>No reviews yet</span>
+          }
+        </div>
         <div className="mt-2 flex items-center justify-between">
           <Price amount={product.price} size="md" />
           <StockBadge stock={product.stock} />

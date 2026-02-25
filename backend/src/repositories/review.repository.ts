@@ -1,12 +1,29 @@
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, Review } from '@prisma/client'
 
-// Stub repository — to be implemented with SL-17
+export type CreateReviewData = {
+  reviewer_name: string
+  rating: number
+  comment?: string
+}
+
 export class ReviewRepository {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  constructor(_db: PrismaClient) {}
+  constructor(private readonly db: PrismaClient) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async findByProduct(_productId: number): Promise<[]> {
-    return []
+  async findByProduct(productId: number): Promise<Review[]> {
+    return this.db.review.findMany({
+      where: { product_id: productId },
+      orderBy: { created_at: 'desc' },
+    })
+  }
+
+  async create(productId: number, data: CreateReviewData): Promise<Review> {
+    return this.db.review.create({
+      data: {
+        product_id: productId,
+        reviewer_name: data.reviewer_name,
+        rating: data.rating,
+        comment: data.comment,
+      },
+    })
   }
 }

@@ -96,7 +96,7 @@ registry.registerPath({
   request: { params: z.object({ productId: z.string() }) },
   responses: {
     200: { description: 'Review list', content: { 'application/json': { schema: ReviewListResponseSchema } } },
-    501: { description: 'Not implemented' },
+    404: { description: 'Product not found' },
   },
 })
 
@@ -111,9 +111,9 @@ registry.registerPath({
   },
   responses: {
     201: { description: 'Review created' },
-    409: { description: 'Duplicate reviewer' },
+    404: { description: 'Product not found' },
+    409: { description: 'You have already reviewed this product' },
     422: { description: 'Validation error' },
-    501: { description: 'Not implemented' },
   },
 })
 

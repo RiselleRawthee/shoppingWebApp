@@ -1,9 +1,11 @@
 import { Router } from 'express'
 import type { ReviewController } from '../controllers/review.controller'
+import { validate } from '../middleware/validate'
+import { CreateReviewRequestSchema } from '../schemas/review.schema'
 
 export const createReviewRouter = (controller: ReviewController): Router => {
   const router = Router({ mergeParams: true })
   router.get('/', controller.get)
-  router.post('/', controller.create)
+  router.post('/', validate(CreateReviewRequestSchema), controller.create)
   return router
 }
