@@ -140,9 +140,26 @@ If yes:
 
 2. Tickets stay in **"In Progress"** when a PR is raised — do not transition them. They will only move to "Done" when the PR is merged via the `/merge-pr` skill. Remind the user: "Run `/merge-pr` after this PR is merged to close the linked tickets."
 
-If the user says no, skip PR creation and leave tickets in "In Progress".
+If the user says no, skip PR creation, skip Step 10, and leave tickets in "In Progress".
 
-### Step 10 — Confirm
+### Step 10 — Run automated PR review (only if a PR was created)
+
+Take the PR number from the response in Step 9. Immediately spawn **both subagents in parallel** using the Task tool — do not wait for one before starting the other:
+
+**Task 1 — security-scanner:**
+> Prompt: "Scan PR #{pr_number} for security vulnerabilities and post inline comments."
+
+**Task 2 — pr-reviewer:**
+> Prompt: "Review PR #{pr_number} against project standards and post inline comments."
+
+Wait for both to complete, then collect their results:
+- Number of BLOCKING issues found by each
+- Number of SUGGESTIONS found by each
+- Whether comments were successfully posted to the PR
+
+If either subagent fails (e.g. GitHub MCP unavailable), note the failure but do not block the overall commit flow — the PR was already created successfully.
+
+### Step 11 — Confirm
 
 Output:
 - Commit SHA (short) and message
@@ -150,3 +167,5 @@ Output:
 - PR URL (if created), or "No PR created"
 - Jira tickets status: list each key, title, and final status (child tickets and their parents should all be "In Progress")
 - Link to each updated ticket: `https://bbdcloud.atlassian.net/browse/{KEY}`
+- Security review: BLOCKING count / SUGGESTION count (or "skipped — no PR created")
+- Code quality review: BLOCKING count / SUGGESTION count (or "skipped — no PR created")

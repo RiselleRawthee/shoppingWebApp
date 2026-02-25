@@ -11,6 +11,7 @@ import {
 } from '../schemas/cart.schema'
 import {
   CreateReviewRequestSchema,
+  ReviewResponseSchema,
   ReviewListResponseSchema,
 } from '../schemas/review.schema'
 
@@ -22,6 +23,7 @@ registry.register('AddToCartRequest', AddToCartRequestSchema)
 registry.register('CartItemResponse', CartItemResponseSchema)
 registry.register('CartResponse', CartResponseSchema)
 registry.register('CreateReviewRequest', CreateReviewRequestSchema)
+registry.register('ReviewResponse', ReviewResponseSchema)
 registry.register('ReviewListResponse', ReviewListResponseSchema)
 
 // Products
@@ -96,7 +98,7 @@ registry.registerPath({
   request: { params: z.object({ productId: z.string() }) },
   responses: {
     200: { description: 'Review list', content: { 'application/json': { schema: ReviewListResponseSchema } } },
-    501: { description: 'Not implemented' },
+    404: { description: 'Product not found' },
   },
 })
 
@@ -110,10 +112,10 @@ registry.registerPath({
     body: { content: { 'application/json': { schema: CreateReviewRequestSchema } } },
   },
   responses: {
-    201: { description: 'Review created' },
+    201: { description: 'Review created', content: { 'application/json': { schema: ReviewResponseSchema } } },
+    404: { description: 'Product not found' },
     409: { description: 'Duplicate reviewer' },
     422: { description: 'Validation error' },
-    501: { description: 'Not implemented' },
   },
 })
 
