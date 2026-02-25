@@ -51,7 +51,7 @@ export const buildApp = (): express.Application => {
 
   const productService = new ProductService(productRepo)
   const cartService = new CartService(cartRepo, productRepo)
-  const reviewService = new ReviewService(reviewRepo)
+  const reviewService = new ReviewService(reviewRepo, productRepo)
 
   const productController = new ProductController(productService)
   const cartController = new CartController(cartService)

@@ -6,6 +6,8 @@ export interface Product {
   image_url: string
   category: string
   stock: number
+  average_rating: number | null
+  total_reviews: number
 }
 
 export interface ProductListResponse {
@@ -31,4 +33,25 @@ export interface AddToCartRequest {
   product_id: number
   quantity: number
   session_id: string
+}
+
+export interface Review {
+  id: number
+  product_id: number
+  reviewer_name: string
+  rating: number
+  comment: string | null
+  created_at: string
+}
+
+export interface ReviewListResponse {
+  reviews: Review[]
+  average_rating: number | null
+  total_reviews: number
+}
+
+export interface CreateReviewRequest {
+  reviewer_name: string
+  rating: number
+  comment?: string
 }

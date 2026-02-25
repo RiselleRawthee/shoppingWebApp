@@ -1,8 +1,8 @@
 import { mockDeep } from 'jest-mock-extended'
-import type { ProductRepository } from '../../src/repositories/product.repository'
+import type { ProductRepository, ProductWithReviewData } from '../../src/repositories/product.repository'
 import { ProductService } from '../../src/services/product.service'
 
-const mockProduct = {
+const mockProductRow: ProductWithReviewData = {
   id: 1,
   name: 'Wireless Headphones',
   description: 'Premium headphones',
@@ -10,6 +10,20 @@ const mockProduct = {
   image_url: 'https://example.com/headphones.jpg',
   category: 'Electronics',
   stock: 25,
+  _count: { reviews: 2 },
+  reviews: [{ rating: 4 }, { rating: 5 }],
+}
+
+const expectedProduct = {
+  id: 1,
+  name: 'Wireless Headphones',
+  description: 'Premium headphones',
+  price: 299.99,
+  image_url: 'https://example.com/headphones.jpg',
+  category: 'Electronics',
+  stock: 25,
+  average_rating: 4.5,
+  total_reviews: 2,
 }
 
 describe('ProductService', () => {
@@ -18,24 +32,31 @@ describe('ProductService', () => {
 
   beforeEach(() => jest.clearAllMocks())
 
-  it('listProducts returns all products with total', async () => {
-    repo.findAll.mockResolvedValue([mockProduct])
+  it('listProducts returns all products with total and computed stats', async () => {
+    repo.findAll.mockResolvedValue([mockProductRow])
     const result = await service.listProducts()
-    expect(result).toEqual({ products: [mockProduct], total: 1 })
+    expect(result).toEqual({ products: [expectedProduct], total: 1 })
     expect(repo.findAll).toHaveBeenCalledWith(undefined)
   })
 
   it('listProducts filters by category', async () => {
-    repo.findAll.mockResolvedValue([mockProduct])
+    repo.findAll.mockResolvedValue([mockProductRow])
     const result = await service.listProducts('Electronics')
     expect(result.products).toHaveLength(1)
     expect(repo.findAll).toHaveBeenCalledWith('Electronics')
   })
 
-  it('getProduct returns product when found', async () => {
-    repo.findById.mockResolvedValue(mockProduct)
+  it('listProducts returns average_rating null when product has no reviews', async () => {
+    repo.findAll.mockResolvedValue([{ ...mockProductRow, _count: { reviews: 0 }, reviews: [] }])
+    const result = await service.listProducts()
+    expect(result.products[0].average_rating).toBeNull()
+    expect(result.products[0].total_reviews).toBe(0)
+  })
+
+  it('getProduct returns product with computed stats', async () => {
+    repo.findById.mockResolvedValue(mockProductRow)
     const result = await service.getProduct(1)
-    expect(result).toEqual(mockProduct)
+    expect(result).toEqual(expectedProduct)
   })
 
   it('getProduct throws 404 when product not found', async () => {

@@ -1,9 +1,9 @@
 import { mockDeep } from 'jest-mock-extended'
 import type { CartRepository } from '../../src/repositories/cart.repository'
-import type { ProductRepository } from '../../src/repositories/product.repository'
+import type { ProductRepository, ProductWithReviewData } from '../../src/repositories/product.repository'
 import { CartService } from '../../src/services/cart.service'
 
-const mockProduct = {
+const mockProduct: ProductWithReviewData = {
   id: 1,
   name: 'Wireless Headphones',
   description: 'Premium headphones',
@@ -11,6 +11,8 @@ const mockProduct = {
   image_url: 'https://example.com/headphones.jpg',
   category: 'Electronics',
   stock: 25,
+  _count: { reviews: 0 },
+  reviews: [],
 }
 
 const mockCartItem = {

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { AddToCartRequest, CartResponse, ProductListResponse, Product } from '../types'
+import type { AddToCartRequest, CartResponse, CreateReviewRequest, ProductListResponse, Product, Review, ReviewListResponse } from '../types'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8000',
@@ -23,4 +23,12 @@ export const cartApi = {
 
   remove: (sessionId: string, itemId: number): Promise<void> =>
     api.delete(`/cart/${sessionId}/${itemId}`),
+}
+
+export const reviewsApi = {
+  list: (productId: number): Promise<ReviewListResponse> =>
+    api.get(`/products/${productId}/reviews`).then((r) => r.data),
+
+  create: (productId: number, data: CreateReviewRequest): Promise<Review> =>
+    api.post(`/products/${productId}/reviews`, data).then((r) => r.data),
 }
