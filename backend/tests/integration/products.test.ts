@@ -38,6 +38,21 @@ describe('GET /products', () => {
   })
 })
 
+describe('GET /categories', () => {
+  it('returns empty array when no products exist', async () => {
+    const res = await request(app).get('/categories').expect(200)
+    expect(res.body).toEqual({ categories: [] })
+  })
+
+  it('returns distinct categories sorted alphabetically', async () => {
+    await createProduct({ category: 'Furniture' })
+    await createProduct({ category: 'Electronics' })
+    await createProduct({ category: 'Electronics' })
+    const res = await request(app).get('/categories').expect(200)
+    expect(res.body).toEqual({ categories: ['Electronics', 'Furniture'] })
+  })
+})
+
 describe('GET /products/:id', () => {
   it('returns product by id', async () => {
     const product = await createProduct({ name: 'Wireless Headphones', price: 299.99 })

@@ -1,21 +1,15 @@
 import { useState } from 'react'
 import { useProducts } from '../hooks/useProducts'
+import { useCategories } from '../hooks/useCategories'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import { ErrorAlert } from '../components/ui/ErrorAlert'
 import { CategoryFilter } from '../components/CategoryFilter'
 import { ProductCard } from '../components/ProductCard'
 
-const CATEGORIES = [
-  { label: 'All' },
-  { label: 'Electronics' },
-  { label: 'Furniture' },
-  { label: 'Lighting' },
-  { label: 'Accessories' },
-]
-
 export function ProductList() {
   const [activeCategory, setActiveCategory] = useState<string | undefined>(undefined)
   const { products, total, loading, error } = useProducts(activeCategory)
+  const { categories: rawCategories } = useCategories()
 
   const handleCategoryChange = (cat: string) => {
     setActiveCategory(cat === 'All' ? undefined : cat)
@@ -24,10 +18,12 @@ export function ProductList() {
   if (loading) return <LoadingSpinner message="Loading products..." />
   if (error) return <ErrorAlert message={error} />
 
+  const categoryItems = [{ label: 'All' }, ...rawCategories.map((c) => ({ label: c }))]
+
   return (
     <div>
       <CategoryFilter
-        categories={CATEGORIES}
+        categories={categoryItems}
         activeValue={activeCategory}
         onChange={handleCategoryChange}
       />

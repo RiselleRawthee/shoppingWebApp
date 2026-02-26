@@ -18,6 +18,7 @@ export const createRootRouter = (controllers: Controllers): Router => {
   const router = Router()
 
   router.get('/health', (_req, res) => res.json({ status: 'ok' }))
+  router.get('/categories', controllers.product.getCategories)
   router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument))
   router.use('/products', createProductRouter(controllers.product))
   router.use('/products/:productId/reviews', createReviewRouter(controllers.review))

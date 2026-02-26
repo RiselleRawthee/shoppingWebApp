@@ -35,4 +35,13 @@ export class ProductRepository {
       },
     })
   }
+
+  async findDistinctCategories(): Promise<string[]> {
+    const rows = await this.db.product.findMany({
+      distinct: ['category'],
+      select: { category: true },
+      orderBy: { category: 'asc' },
+    })
+    return rows.map((r) => r.category)
+  }
 }
