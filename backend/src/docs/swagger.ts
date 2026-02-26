@@ -3,7 +3,7 @@ import {
   OpenApiGeneratorV3,
 } from '@asteasolutions/zod-to-openapi'
 import { z } from 'zod'
-import { ProductSchema, ProductListResponseSchema } from '../schemas/product.schema'
+import { ProductSchema, ProductListResponseSchema, CategoriesResponseSchema } from '../schemas/product.schema'
 import {
   AddToCartRequestSchema,
   CartItemResponseSchema,
@@ -19,12 +19,27 @@ const registry = new OpenAPIRegistry()
 
 registry.register('Product', ProductSchema)
 registry.register('ProductListResponse', ProductListResponseSchema)
+registry.register('CategoriesResponse', CategoriesResponseSchema)
 registry.register('AddToCartRequest', AddToCartRequestSchema)
 registry.register('CartItemResponse', CartItemResponseSchema)
 registry.register('CartResponse', CartResponseSchema)
 registry.register('CreateReviewRequest', CreateReviewRequestSchema)
 registry.register('ReviewResponse', ReviewResponseSchema)
 registry.register('ReviewListResponse', ReviewListResponseSchema)
+
+// Categories
+registry.registerPath({
+  method: 'get',
+  path: '/categories',
+  summary: 'List all distinct product categories',
+  tags: ['Products'],
+  responses: {
+    200: {
+      description: 'Alphabetically sorted list of categories',
+      content: { 'application/json': { schema: CategoriesResponseSchema } },
+    },
+  },
+})
 
 // Products
 registry.registerPath({

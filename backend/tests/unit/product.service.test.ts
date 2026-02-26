@@ -67,4 +67,19 @@ describe('ProductService', () => {
     })
     expect(repo.findById).toHaveBeenCalledWith(99)
   })
+
+  describe('getCategories', () => {
+    it('returns categories from repo', async () => {
+      repo.findDistinctCategories.mockResolvedValue(['Accessories', 'Electronics'])
+      const result = await service.getCategories()
+      expect(result).toEqual({ categories: ['Accessories', 'Electronics'] })
+      expect(repo.findDistinctCategories).toHaveBeenCalledTimes(1)
+    })
+
+    it('returns empty array when no products exist', async () => {
+      repo.findDistinctCategories.mockResolvedValue([])
+      const result = await service.getCategories()
+      expect(result).toEqual({ categories: [] })
+    })
+  })
 })

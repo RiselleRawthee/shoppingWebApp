@@ -42,4 +42,9 @@ export class ProductService {
     if (!row) throw new AppError('Product not found', 404)
     return computeStats(row)
   }
+
+  async getCategories(): Promise<{ categories: string[] }> {
+    const categories = await this.repo.findDistinctCategories()
+    return { categories }
+  }
 }
