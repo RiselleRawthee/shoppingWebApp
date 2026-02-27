@@ -33,5 +33,49 @@ services:
       timeout: 5s
       retries: 5
 
+  db-init:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: deps
+    container_name: shoplite-db-init
+    environment:
+      DATABASE_URL: postgresql://shoplite:shoplite@db:5432/shoplite
+    command: sh -c "npx prisma migrate deploy && npx tsx prisma/seed.ts"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shoplite-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://shoplite:shoplite@db:5432/shoplite
+      NODE_ENV: production
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8000
+    container_name: shoplite-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
