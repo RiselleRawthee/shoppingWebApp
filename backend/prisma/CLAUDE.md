@@ -208,10 +208,13 @@ cause FK constraint violations in integration tests.
 
 ## Key Commands
 
+Migrations and seed data run automatically on `docker compose up --build` via the `db-init` service.
+Run these manually only when making schema changes during development (Docker must be running):
+
 ```bash
-# From backend/
-npm run db:migrate    # create migration from schema changes + apply to dev DB
+# From backend/ — targets the Docker dev DB at localhost:5432
+npm run db:migrate    # create migration from schema changes + apply to Docker dev DB
 npm run db:generate   # regenerate Prisma TypeScript client types
-npm run db:seed       # seed 10 products (idempotent)
-npm run db:studio     # open Prisma Studio — visual DB browser
+npm run db:seed       # re-seed 10 products into Docker dev DB (idempotent)
+npm run db:studio     # open Prisma Studio — connects to Docker dev DB
 ```

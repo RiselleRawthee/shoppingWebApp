@@ -275,15 +275,22 @@ const mockProduct: Product = {
 
 ---
 
+## Running the App
+
+**Always use Docker Compose from the repo root — never `npm run dev` to serve the application:**
+```bash
+docker compose up --build   # first run — builds and serves frontend at http://localhost:5173
+docker compose up           # subsequent runs
+```
+
 ## Key Commands
 
 ```bash
-# From frontend/
-npm run dev      # Vite dev server (http://localhost:5173)
-npm test         # Vitest watch mode
+# From frontend/ — for development tasks (linting, testing, type-checking)
+npm test           # Vitest watch mode
 npm test -- --run  # Vitest single run (CI)
-npm run lint     # ESLint check
-npm run build    # tsc type-check + Vite production build
+npm run lint       # ESLint check
+npm run build      # tsc type-check + Vite production build
 ```
 
 Pre-commit: Husky + lint-staged auto-runs `eslint --fix` on all `src/**/*.{ts,tsx}` files.

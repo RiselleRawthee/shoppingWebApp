@@ -260,18 +260,25 @@ errorHandler        MUST be last
 
 ---
 
+## Running the App
+
+**Always use Docker Compose from the repo root — never `npm run dev` to serve the application:**
+```bash
+docker compose up --build   # first run — builds images, runs migrations, seeds DB, starts all services
+docker compose up           # subsequent runs
+```
+
 ## Key Commands
 
 ```bash
-# From backend/
-npm run dev              # tsx watch — hot reload dev server
+# From backend/ — for development tasks (linting, testing, DB management)
 npm run build            # tsc → dist/
 npm run test:unit        # Jest unit tests (fast, no DB)
-npm run test:integration # Jest integration tests (requires PostgreSQL)
+npm run test:integration # Jest integration tests (requires db-test Docker container on localhost:5433)
 npm test                 # unit then integration (sequential)
 npm run lint             # ESLint check
 npm run lint:fix         # ESLint auto-fix
-npm run db:migrate       # apply Prisma migrations
-npm run db:seed          # seed 10 products
-npm run db:studio        # Prisma Studio GUI
+npm run db:migrate       # apply Prisma migrations to the Docker dev DB (localhost:5432)
+npm run db:seed          # seed 10 products into the Docker dev DB
+npm run db:studio        # Prisma Studio GUI — connects to localhost:5432
 ```

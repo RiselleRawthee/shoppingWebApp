@@ -24,7 +24,7 @@ shoplite/
 │   ├── DATABASE.md       schema, ERD, design decisions
 │   └── PATTERNS.md       code patterns with examples for all layers
 ├── .claude/skills/    Custom Claude Code skills (see Skills section below)
-├── docker-compose.yml PostgreSQL for portability (local dev uses Homebrew)
+├── docker-compose.yml Full stack (db + db-test + backend + frontend) — docker compose up --build
 ├── .mcp.json          MCP server config (GitHub, Jira, Confluence, Postgres)
 └── package.json       Root: Husky + lint-staged pre-commit hooks
 ```
@@ -129,39 +129,43 @@ Jira project key: **`SL`** — always use this in ticket references and branch n
 
 ---
 
-## Running the App (Local — Homebrew PostgreSQL)
+## Running the App (Docker)
+
+**Always run the application via Docker Compose.** No local PostgreSQL or manual setup required.
 
 ```bash
-# Ensure PostgreSQL is running (Homebrew, macOS)
-brew services start postgresql@16
+# From the repo root — builds images and starts all services
+docker compose up --build
 
-# Backend
-cd backend
-npm install
-npm run db:migrate    # apply Prisma migrations
-npm run db:seed       # seed 10 products (first time only)
-npm run dev           # API at http://localhost:8000, Swagger at /api-docs
-
-# Frontend (separate terminal)
-cd frontend
-npm install
-npm run dev           # App at http://localhost:5173
+# Subsequent runs (images already built)
+docker compose up
 ```
 
-**Database credentials:** user `shoplite`, password `shoplite`
-- Dev: `postgresql://shoplite:shoplite@localhost:5432/shoplite`
-- Test: `postgresql://shoplite:shoplite@localhost:5432/shoplite_test`
+| Service | URL | Description |
+|---------|-----|-------------|
+| `db` | `localhost:5432` | PostgreSQL — dev data |
+| `db-test` | `localhost:5433` | PostgreSQL — integration test data |
+| `backend` | `http://localhost:8000` | Express API + Swagger at `/api-docs` |
+| `frontend` | `http://localhost:5173` | React SPA served by nginx |
+
+Migrations and seed data (10 products) are applied automatically on first start via the `db-init` service.
 
 ---
 
 ## Running Tests
 
+Integration tests run locally against the Docker `db-test` container.
+**`docker compose up` must be running before executing integration tests.**
+
 ```bash
 # Backend (from backend/)
 npm run test:unit          # fast, no DB required
-npm run test:integration   # requires PostgreSQL running with shoplite_test DB
+npm run test:integration   # requires db-test container running on localhost:5433
 npm test                   # both suites, sequentially
 
 # Frontend (from frontend/)
 npm test -- --run          # Vitest single-run
 ```
+
+Ensure `DATABASE_URL_TEST` in `backend/.env` uses port `5433` (the Docker test DB):
+`DATABASE_URL_TEST=postgresql://shoplite:shoplite@localhost:5433/shoplite_test`
